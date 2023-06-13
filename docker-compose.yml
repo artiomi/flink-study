@@ -1,0 +1,50 @@
+version: "2.2"
+networks:
+  flink-network:
+    driver: bridge
+services:
+  jobmanager:
+    image: flink:latest
+    container_name: jobmanager
+    hostname: jobmanager
+    ports:
+      - "8081:8081"
+    networks:
+      - flink-network
+    command: jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager        
+
+  taskmanager:
+    image: flink:latest
+    container_name: taskmanager
+    hostname: taskmanager
+    networks:
+      - flink-network
+    depends_on:
+      - jobmanager
+    command: taskmanager
+    scale: 1
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.numberOfTaskSlots: 2
+        
+
+  sql-client:
+    image: flink:latest
+    container_name: sql-client
+    hostname: sql-client
+    networks:
+      - flink-network
+    command: bin/sql-client.sh
+    depends_on:
+      - jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        rest.address: jobmanager
