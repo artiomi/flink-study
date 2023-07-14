@@ -3,6 +3,7 @@ package my.study.samples;
 import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.IterativeStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -11,7 +12,7 @@ public class IterativeStreamExample {
 
   public static void main(String[] args) throws Exception {
     try (StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment()) {
-
+      env.enableCheckpointing(10, CheckpointingMode.EXACTLY_ONCE);
       DataStream<Long> someIntegers = env.fromSequence(0, 5);
 
       IterativeStream<Long> iteration = someIntegers.iterate();
